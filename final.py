@@ -13,7 +13,6 @@ def BLUR_f(t_r, t_l, b_l, b_r, src):
 
     img_c = img.copy()
 
-    # your method to blur using masking
     land_m = f.get_facial_landmarks(img)
     convex_h = cv.convexHull(land_m)
     cv.imwrite('ss2.jpg', img_c)
@@ -31,19 +30,17 @@ def BLUR_f(t_r, t_l, b_l, b_r, src):
 
     fin = cv.add(bk, img_ex)
 
-    # returning only that part which we extracted in variable name (img) with blured face
     src[b_l:t_l, b_r:t_r] = fin
     return src
 
 
-# Open the input movie file
+
 input_movie = cv.VideoCapture("Vid_MV.mp4")
 length = int(input_movie.get(cv.CAP_PROP_FRAME_COUNT))
 framespersecond = int(input_movie.get(cv.CAP_PROP_FPS))
 ret, frame = input_movie.read()
 height, width, channels = frame.shape
 
-# Create an output movie file (make sure resolution/frame rate matches input video!)
 fourcc = cv.VideoWriter_fourcc(*'XVID')
 output_movie = cv.VideoWriter('stormzyv.avi', fourcc, framespersecond, (width, height))
 
@@ -59,7 +56,6 @@ known_faces = [
     al_face_encoding
 ]
 
-# Initialize some variables
 face_locations = []
 face_encodings = []
 face_names = []
@@ -70,24 +66,21 @@ while True:
     ret, frame = input_movie.read()
     frame_number += 1
 
-    # Quit when the input video file ends
+    
     if not ret:
         break
 
-    # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+
     rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
-    # Find all the faces and face encodings in the current frame of video
     face_locations = face_recognition.face_locations(rgb_frame)
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
     face_names = []
     for face_encoding in face_encodings:
-        # See if the face is a match for the known face(s)
+
         match = face_recognition.compare_faces(known_faces, face_encoding, tolerance=0.50)
 
-        # If you had more than 2 faces, you could make this logic a lot prettier
-        # but I kept it simple for the demo
         name = None
         if match[0]:
             name = "Man 1"
@@ -96,7 +89,6 @@ while True:
 
         face_names.append(name)
 
-    # Label the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         if not name:
             # output_movie.write(frame)
