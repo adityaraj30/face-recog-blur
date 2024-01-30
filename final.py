@@ -62,7 +62,6 @@ face_names = []
 frame_number = 0
 
 while True:
-    # Grab a single frame of video
     ret, frame = input_movie.read()
     frame_number += 1
 
