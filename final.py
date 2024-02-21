@@ -56,7 +56,7 @@ image2_encoding = face_recognition.face_encodings(image2)[0]
 
 known_faces = [
     image1_encoding,
-    image2_encoding
+    # image2_encoding
 ]
 
 # Initialize some variables
@@ -82,36 +82,37 @@ while True:
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
     face_names = []
-    for face_encoding in face_encodings:
-        match = face_recognition.compare_faces(known_faces, face_encoding, tolerance=0.50)
-        name = None
-        if match[0]:
-            name = "Man 1"
-        #elif match[1]:
-        #    name = "Man 2"
+    if face_encodings != None:
+        for face_encoding in face_encodings:
+            match = face_recognition.compare_faces(known_faces, face_encoding, tolerance=0.50)
+            name = None
+            if match[0]:
+                name = "Man 1"
+            #elif match[1]:
+            #    name = "Man 2"
 
-        face_names.append(name)
+            face_names.append(name)
 
-    # Label the results
-    for (top, right, bottom, left), name in zip(face_locations, face_names):
-        if not name:
-            # output_movie.write(frame)
-            continue
+        # Label the results
+        for (top, right, bottom, left), name in zip(face_locations, face_names):
+            if not name:
+                # output_movie.write(frame)
+                continue
 
-        # Draw a box around the face
-        # cv.rectangle(frame, (left - 20, top - 20), (right + 20, bottom + 20), (0, 0, 255), 2)
+            # Draw a box around the face
+            # cv.rectangle(frame, (left - 20, top - 20), (right + 20, bottom + 20), (0, 0, 255), 2)
 
-        width_n = right - left
-        height_n = bottom - top
-        # y1,x1 = b_l, y1+h,x1+w = t_r
-        # left,bottom = x1,y1 ,   bottom = b_l, top = t_l,
-        # right, top = x1+w, y1+h, left = b_r, right = t_r
+            # y1,x1 = b_l, y1+h,x1+w = t_r
+            # left,bottom = x1,y1 ,   bottom = b_l, top = t_l,
+            # right, top = x1+w, y1+h, left = b_r, right = t_r
 
-        test_frame = BLUR_f(right, bottom, top, left ,frame)
-        # Draw a label with a name below the face
-        #cv.rectangle(frame, (left, bottom - 25), (right, bottom), (0, 0, 255), cv.FILLED)
-        #font = cv.FONT_HERSHEY_DUPLEX
-        #cv.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
+            test_frame = BLUR_f(right, bottom, top, left ,frame)
+            # Draw a label with a name below the face
+            #cv.rectangle(frame, (left, bottom - 25), (right, bottom), (0, 0, 255), cv.FILLED)
+            #font = cv.FONT_HERSHEY_DUPLEX
+            #cv.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
+    else:
+        continue
 
     # cv.imshow("frame", frame)
     # Write the resulting image to the output video file
@@ -120,6 +121,8 @@ while True:
     output_movie.write(test_frame)
 
 
+
 input_movie.release()
 cv.destroyAllWindows()
+
 
