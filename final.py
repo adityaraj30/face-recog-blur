@@ -13,6 +13,7 @@ def BLUR_f(t_r, t_l, b_l, b_r, src):
 
     img_c = img.copy()
 
+    # your method to blur using masking
     land_m = f.get_facial_landmarks(img)
     convex_h = cv.convexHull(land_m)
     cv.imwrite('ss2.jpg', img_c)
@@ -30,64 +31,68 @@ def BLUR_f(t_r, t_l, b_l, b_r, src):
 
     fin = cv.add(bk, img_ex)
 
+    # returning only that part which we extracted in variable name (img) with blured face
     src[b_l:t_l, b_r:t_r] = fin
     return src
 
 
-
-input_movie = cv.VideoCapture("Vid_MV.mp4")
+# Open the input movie file
+input_movie = cv.VideoCapture("GOP_Debate.mov")
 length = int(input_movie.get(cv.CAP_PROP_FRAME_COUNT))
 framespersecond = int(input_movie.get(cv.CAP_PROP_FPS))
 ret, frame = input_movie.read()
 height, width, channels = frame.shape
 
+# Create an output movie file (make sure resolution/frame rate matches input video!)
 fourcc = cv.VideoWriter_fourcc(*'XVID')
-output_movie = cv.VideoWriter('stormzyv.avi', fourcc, framespersecond, (width, height))
+output_movie = cv.VideoWriter('gengop.avi', fourcc, framespersecond, (width, height))
 
 # Load some sample pictures and learn how to recognize them.
-lmm_image = face_recognition.load_image_file("stormzy.png")
-lmm_face_encoding = face_recognition.face_encodings(lmm_image)[0]
+image1 = face_recognition.load_image_file("Vivek.jpeg")
+image1_encoding = face_recognition.face_encodings(image1)[0]
 
-al_image = face_recognition.load_image_file("stormzy2.jpg")
-al_face_encoding = face_recognition.face_encodings(al_image)[0]
+image2 = face_recognition.load_image_file("Nikki.jpeg")
+image2_encoding = face_recognition.face_encodings(image2)[0]
 
 known_faces = [
-    lmm_face_encoding,
-    al_face_encoding
+    image1_encoding,
+    image2_encoding
 ]
 
+# Initialize some variables
 face_locations = []
 face_encodings = []
 face_names = []
 frame_number = 0
 
 while True:
+    # Grab a single frame of video
     ret, frame = input_movie.read()
     frame_number += 1
 
-    
+    # Quit when the input video file ends
     if not ret:
         break
 
-
+    # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
     rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
+    # Find all the faces and face encodings in the current frame of video
     face_locations = face_recognition.face_locations(rgb_frame)
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
     face_names = []
     for face_encoding in face_encodings:
-
         match = face_recognition.compare_faces(known_faces, face_encoding, tolerance=0.50)
-
         name = None
         if match[0]:
             name = "Man 1"
-        elif match[1]:
-            name = "Man 2"
+        #elif match[1]:
+        #    name = "Man 2"
 
         face_names.append(name)
 
+    # Label the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         if not name:
             # output_movie.write(frame)
@@ -113,6 +118,7 @@ while True:
     print("Writing frame {} / {}".format(frame_number, length))
     # output_movie.write(frame)
     output_movie.write(test_frame)
+
 
 input_movie.release()
 cv.destroyAllWindows()
